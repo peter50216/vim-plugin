@@ -20,21 +20,19 @@ def TempFile():
         os.unlink(path)
 
 def GenerateKeys():
+  subprocess.check_call(['openssl', 'genrsa', '-out', PRIVATE_KEY, '2048'])
   subprocess.check_call(
-      'openssl genrsa -out %s 2048' % PRIVATE_KEY,
-      shell=True)
-  subprocess.check_call(
-      'openssl rsa -pubout -in %s -out %s' % (PRIVATE_KEY, PUBLIC_KEY),
-      shell=True)
+      ['openssl', 'rsa', '-pubout', '-in', PRIVATE_KEY, '-out', PUBLIC_KEY])
+
 
 def Sign(text):
   with TempFile() as temp:
     with open(temp, 'w') as tempf:
       tempf.write(text)
-    return subprocess.check_output(
-        'openssl dgst -sha256 -sign ~/.lvimrc_private.pem %s '
-        '| base64 -w 0' % temp,
-        shell=True)
+    return base64.b64encode(
+        subprocess.check_output(
+            ['openssl', 'dgst', '-sha256', '-sign', PRIVATE_KEY, temp]))
+
 
 def Verify(text, sign):
   with TempFile() as temp_sig_file:
@@ -43,10 +41,15 @@ def Verify(text, sign):
     with TempFile() as temp_file:
       with open(temp_file, 'w') as f:
         f.write(text)
-      return subprocess.call(
-          'openssl dgst -sha256 -verify %s -signature %s %s >/dev/null' %
-          (PUBLIC_KEY, temp_sig_file, temp_file),
-          shell=True) == 0
+      with open(os.devnull, 'w') as devnull:
+        return subprocess.call(
+            [
+                'openssl', 'dgst', '-sha256', '-verify', PUBLIC_KEY,
+                '-signature', temp_sig_file, temp_file
+            ],
+            stdout=devnull,
+            stderr=devnull) == 0
+
 
 def SplitSign(text):
   lines = text.splitlines(True)
