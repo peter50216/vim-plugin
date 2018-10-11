@@ -23,7 +23,7 @@ import vim
 sys.path.insert(0, vim.eval('s:path'))
 import sign_lvimrc
 
-d = vim.eval('l:dir')
+d = os.path.abspath(vim.eval('l:dir'))
 while d != '/':
   path = os.path.join(d, '.lvimrc')
   if os.path.exists(path):
