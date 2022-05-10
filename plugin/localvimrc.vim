@@ -15,7 +15,7 @@ function! s:LoadLocalVimrc()
   if empty(l:dir)
     let l:dir = getcwd()
   endif
-  python <<EOF
+  python3 <<EOF
 import os
 import sys
 import vim
@@ -33,9 +33,9 @@ while d != '/':
       vim.command('source %s' % path)
       break
     elif sign is None:
-      print 'lvimrc %s is not signed, ignore.' % path
+      print('lvimrc %s is not signed, ignore.' % path)
     else:
-      print 'lvimrc %s has incorrect sign, ignore.' % path
+      print('lvimrc %s has incorrect sign, ignore.' % path)
   d = os.path.dirname(d)
 EOF
 endfunction

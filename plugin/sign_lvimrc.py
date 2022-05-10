@@ -36,7 +36,7 @@ def Sign(text):
 
 def Verify(text, sign):
   with TempFile() as temp_sig_file:
-    with open(temp_sig_file, 'w') as f:
+    with open(temp_sig_file, 'wb') as f:
       f.write(base64.b64decode(sign))
     with TempFile() as temp_file:
       with open(temp_file, 'w') as f:
@@ -61,11 +61,11 @@ def SplitSign(text):
 
 def main():
   if not os.path.exists(PRIVATE_KEY):
-    print "Keys not exists, generating keys..."
+    print("Keys not exists, generating keys...")
     GenerateKeys()
 
   if len(sys.argv) <= 1:
-    print "Usage: %s [lvimrc]" % __file__
+    print("Usage: %s [lvimrc]" % __file__)
     sys.exit(0)
 
   lvimrc = sys.argv[1]
